@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Friending, Posting, Sessioning } from "./app";
+import { Authing, Checking, Friending, Posting, Sessioning, Tracking, Whitelisting } from "./app";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
@@ -35,7 +35,12 @@ class Routes {
   @Router.post("/users")
   async createUser(session: SessionDoc, username: string, password: string) {
     Sessioning.isLoggedOut(session);
-    return await Authing.create(username, password);
+    const aus = await Authing.create(username, password);
+    if (aus.user) {
+      await Whitelisting.create(aus.user._id, []);
+      await Checking.create(aus.user._id);
+    };
+    return aus;
   }
 
   @Router.patch("/users/username")
@@ -54,6 +59,14 @@ class Routes {
   async deleteUser(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     Sessioning.end(session);
+    const list = await Whitelisting.getByOwner(user);
+    if (list){
+      Whitelisting.delete(list._id, user);
+    }
+    const chk = await Checking.getByOwner(user);
+    if (chk) {
+      Checking.delete(chk._id, user);
+    }
     return await Authing.delete(user);
   }
 
@@ -84,18 +97,30 @@ class Routes {
   }
 
   @Router.post("/posts")
-  async createPost(session: SessionDoc, content: string, options?: PostOptions) {
+  async createPost(session: SessionDoc, content: string, options?: PostOptions, images?: string) {
     const user = Sessioning.getUser(session);
-    const created = await Posting.create(user, content, options);
+    const created = await Posting.create(user, content, options, images);
+    if (images) {
+      const chk = await Checking.getByOwner(user);
+      if (chk) await Checking.update(chk._id, images);
+    }
     return { msg: created.msg, post: await Responses.post(created.post) };
   }
 
   @Router.patch("/posts/:id")
-  async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+  async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions, images?: string) {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.assertAuthorIsUser(oid, user);
-    return await Posting.update(oid, content, options);
+    if (images) {
+      const post = await Posting.getOnePost(oid);
+      const chk = await Checking.getByOwner(user);
+      if (chk && post) {
+        const old_image = post.images;
+        await Checking.swap(chk._id, old_image, images);
+      }
+    }
+    return await Posting.update(oid, content, options, images);
   }
 
   @Router.delete("/posts/:id")
@@ -103,6 +128,9 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.assertAuthorIsUser(oid, user);
+    const oldPost = await Posting.getOnePost(oid);
+    const chkId = await Checking.getByOwner(user).then(response => response?._id);
+    if (chkId && oldPost) await Checking.remove(chkId, oldPost.images)
     return Posting.delete(oid);
   }
 
@@ -151,6 +179,48 @@ class Routes {
     const user = Sessioning.getUser(session);
     const fromOid = (await Authing.getUserByUsername(from))._id;
     return await Friending.rejectRequest(fromOid, user);
+  }
+
+  // New
+  @Router.patch("/whitelist/add")
+  async addToWhitelist(session: SessionDoc, entry: string) {
+    const user = Sessioning.getUser(session);
+    const oldList = await Whitelisting.getByOwner(user);
+    if (oldList){
+      return await Whitelisting.add(oldList._id, entry);
+    }
+  }
+  @Router.patch("/whitelist/remove")
+  async removeFromWhitelist(session: SessionDoc, entry: string) {
+    const user = Sessioning.getUser(session);
+    const oldList = await Whitelisting.getByOwner(user);
+    if (oldList){
+      return await Whitelisting.remove(oldList._id, entry);
+    }
+  }
+  @Router.get("/whitelist")
+  async getWhitelist(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Whitelisting.getList(user);
+  }
+  @Router.get("/track/:target")
+  async getTarget(target: string) {
+    return await Tracking.getByTarget(target);
+  }
+  @Router.patch("/track/:target")
+  async changeTarget(target: string) {
+    return await Tracking.update(target);
+  }
+  @Router.delete("/track/:target")
+  async deleteTarget(target: string) {
+    return await Tracking.delete(target);
+  }
+  // @Router.get("/checkIm/:src")
+  // async checkImg(src: string) {
+  // }
+  @Router.get("/checkIm/temp")
+  async tempCheck(src: string) {
+    return await Checking.tCheck(src);
   }
 }
 
