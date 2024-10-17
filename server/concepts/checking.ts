@@ -25,11 +25,11 @@ export default class CheckingConcept {
    */
   constructor(collectionName: string) {
     this.chks = new DocCollection<CheckingDoc>(collectionName);
-    this.ims = new DocCollection<SingleImDoc>(collectionName+"Ims")
+    this.ims = new DocCollection<SingleImDoc>(collectionName + "Ims");
   }
 
   async create(owner: ObjectId) {
-    const _id = await this.chks.createOne({ owner, images:[] });
+    const _id = await this.chks.createOne({ owner, images: [] });
     return { msg: "Check successfully created!", check: await this.chks.readOne({ _id }) };
   }
 
@@ -40,28 +40,30 @@ export default class CheckingConcept {
   async update(_id: ObjectId, image?: string) {
     // Note that if content or options is undefined, those fields will *not* be updated
     // since undefined values for partialUpdateOne are ignored.
-    let chk = await this.chks.readOne({ _id });
+    const chk = await this.chks.readOne({ _id });
     if (chk) {
       if (image) {
         const imData = await this.download(image);
         chk.images.push(image);
-        this.ims.createOne({owner:_id, image: imData});
+        await this.ims.createOne({ owner: _id, image: imData });
       }
       await this.chks.partialUpdateOne({ _id }, { images: chk.images });
     }
     return { msg: "Check successfully updated!" };
   }
 
-  async remove(_id: ObjectId, image: string) {
-    const chk = await this.chks.readOne({_id});
-    if (!chk){
+  async remove(_id: ObjectId, image?: string) {
+    const chk = await this.chks.readOne({ _id });
+    if (!chk) {
       throw new NotFoundError(`List ${_id} does not exist!`);
     }
-    const newChecks = chk.images.filter(s=>s!==image);
-    await this.chks.partialUpdateOne({ _id }, { images:newChecks });
-    const imData = await this.download(image);
-    await this.ims.deleteOne({image:imData});
-    return { msg: `Removed ${image} from List successfully!`, list:newChecks };
+    const newChecks = chk.images.filter((s) => s !== image);
+    await this.chks.partialUpdateOne({ _id }, { images: newChecks });
+    if (image) {
+      const imData = await this.download(image);
+      await this.ims.deleteOne({ image: imData });
+    }
+    return { msg: `Removed ${image} from List successfully!`, list: newChecks };
   }
 
   async swap(_id: ObjectId, old_image: string, new_image: string) {
@@ -72,7 +74,7 @@ export default class CheckingConcept {
   async delete(_id: ObjectId, user: ObjectId) {
     await this.assertOwnerIsUser(_id, user);
     await this.chks.deleteOne({ _id });
-    await this.ims.deleteMany({owner:user});
+    await this.ims.deleteMany({ owner: user });
     return { msg: "Check deleted successfully!" };
   }
 
@@ -88,9 +90,9 @@ export default class CheckingConcept {
 
   async check(src: string) {
     const imData = await this.download(src);
-    const posIm = await this.ims.readMany({image:imData});
+    const posIm = await this.ims.readMany({ image: imData });
     if (posIm.length > 0) throw new ImageExistsError();
-    return {msg: "Image is unique"};
+    return { msg: "Image is unique" };
   }
 
   private async download(src: string) {
@@ -111,22 +113,21 @@ export default class CheckingConcept {
         return data;
       }
       // Otherwise do something here to process current chunk
-      value.forEach(e => {
+      value.forEach((e) => {
         data += e.toString(16);
       });
     }
   }
 
-  private parseUrl(src: string) {
-    const re = /\/([^\/]+.)\//gm
+  parseUrl(src: string) {
+    const re = /\/([^\/]+.)\//gm;
     const parsed_src = src.match(re);
-    let fileId = '';
+    let fileId = "";
     if (parsed_src && parsed_src.length == 2) {
-      fileId = parsed_src[1].slice(1,-1);
+      fileId = parsed_src[1].slice(1, -1);
     }
     return "https://drive.usercontent.google.com/download?id=" + fileId;
   }
-
 }
 
 export class CheckOwnerNotMatchError extends NotAllowedError {
@@ -138,8 +139,7 @@ export class CheckOwnerNotMatchError extends NotAllowedError {
   }
 }
 export class ImageExistsError extends NotAllowedError {
-  constructor(
-  ) {
+  constructor() {
     super("Image already exists");
   }
 }

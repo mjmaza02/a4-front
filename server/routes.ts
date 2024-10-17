@@ -39,7 +39,7 @@ class Routes {
     if (aus.user) {
       await Whitelisting.create(aus.user._id, []);
       await Checking.create(aus.user._id);
-    };
+    }
     return aus;
   }
 
@@ -60,12 +60,12 @@ class Routes {
     const user = Sessioning.getUser(session);
     Sessioning.end(session);
     const list = await Whitelisting.getByOwner(user);
-    if (list){
-      Whitelisting.delete(list._id, user);
+    if (list) {
+      await Whitelisting.delete(list._id, user);
     }
     const chk = await Checking.getByOwner(user);
     if (chk) {
-      Checking.delete(chk._id, user);
+      await Checking.delete(chk._id, user);
     }
     return await Authing.delete(user);
   }
@@ -93,6 +93,9 @@ class Routes {
     } else {
       posts = await Posting.getPosts();
     }
+    posts.map((post) => {
+      if (post.images) post.images = Checking.parseUrl(post.images);
+    });
     return Responses.posts(posts);
   }
 
@@ -105,6 +108,20 @@ class Routes {
       if (chk) await Checking.update(chk._id, images);
     }
     return { msg: created.msg, post: await Responses.post(created.post) };
+  }
+
+  @Router.patch("/posts/like/:id")
+  async likePost(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(id);
+    await Posting.like(oid, user);
+  }
+
+  @Router.patch("/posts/dislike/:id")
+  async dislikePost(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(id);
+    await Posting.dislike(oid, user);
   }
 
   @Router.patch("/posts/:id")
@@ -129,8 +146,8 @@ class Routes {
     const oid = new ObjectId(id);
     await Posting.assertAuthorIsUser(oid, user);
     const oldPost = await Posting.getOnePost(oid);
-    const chkId = await Checking.getByOwner(user).then(response => response?._id);
-    if (chkId && oldPost) await Checking.remove(chkId, oldPost.images)
+    const chkId = await Checking.getByOwner(user).then((response) => response?._id);
+    if (chkId && oldPost) await Checking.remove(chkId, oldPost.images);
     return Posting.delete(oid);
   }
 
@@ -186,7 +203,7 @@ class Routes {
   async addToWhitelist(session: SessionDoc, entry: string) {
     const user = Sessioning.getUser(session);
     const oldList = await Whitelisting.getByOwner(user);
-    if (oldList){
+    if (oldList) {
       return await Whitelisting.add(oldList._id, entry);
     }
   }
@@ -194,7 +211,7 @@ class Routes {
   async removeFromWhitelist(session: SessionDoc, entry: string) {
     const user = Sessioning.getUser(session);
     const oldList = await Whitelisting.getByOwner(user);
-    if (oldList){
+    if (oldList) {
       return await Whitelisting.remove(oldList._id, entry);
     }
   }

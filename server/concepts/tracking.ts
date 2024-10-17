@@ -1,7 +1,5 @@
-import { ObjectId } from "mongodb";
-
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotFoundError } from "./errors";
 
 export interface TrackingDoc extends BaseDoc {
   target: string;
@@ -22,8 +20,8 @@ export default class TrackingConcept {
   }
 
   private async create(target: string) {
-    const _id = await this.track.createOne({ target, counter:0 });
-    return this.track.readOne({ _id }) ;
+    const _id = await this.track.createOne({ target, counter: 0 });
+    return this.track.readOne({ _id });
   }
 
   async getByTarget(target: string) {
@@ -41,19 +39,18 @@ export default class TrackingConcept {
     if (!tracker) {
       throw new NotFoundError(`Tracker ${target} not found`);
     }
-    return await this.track.partialUpdateOne({ target }, { counter: (tracker.counter+1) });
+    return await this.track.partialUpdateOne({ target }, { counter: tracker.counter + 1 });
   }
 
   async reduce(target: string) {
-        const tracker = await this.track.readOne({ target });
+    const tracker = await this.track.readOne({ target });
     if (!tracker) {
       throw new NotFoundError(`Tracker ${target} not found`);
     }
-    return await this.track.partialUpdateOne({ target }, { counter: (tracker.counter-1) });
-
+    return await this.track.partialUpdateOne({ target }, { counter: tracker.counter - 1 });
   }
 
-  async delete(target:string) {
+  async delete(target: string) {
     return await this.track.deleteOne({ target });
   }
 }

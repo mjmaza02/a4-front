@@ -22,29 +22,29 @@ export default class ListingConcept {
   }
   /**
    * Creates a singular list
-   * @param owner 
-   * @param list 
-   * @returns 
+   * @param owner
+   * @param list
+   * @returns
    */
   async create(owner: ObjectId, list: string[]) {
-    const _id = await this.lists.createOne({ owner, list});
+    const _id = await this.lists.createOne({ owner, list });
     return { msg: "List successfully created!", post: await this.lists.readOne({ _id }) };
   }
   /**
    * Deletes a singular list
-   * @param _id 
-   * @param user 
-   * @returns 
+   * @param _id
+   * @param user
+   * @returns
    */
-  async delete(_id: ObjectId, user: ObjectId){
-    this.assertOwnerIsUser(_id, user);
-    this.lists.deleteOne({ _id });
+  async delete(_id: ObjectId, user: ObjectId) {
+    await this.assertOwnerIsUser(_id, user);
+    await this.lists.deleteOne({ _id });
     return { msg: "Deleted List successfully!" };
   }
 
   /**
    * Gets list by it's owner
-   * @param owner 
+   * @param owner
    * @returns {ListDoc} list associated with the owner
    */
   async getByOwner(owner: ObjectId) {
@@ -53,12 +53,12 @@ export default class ListingConcept {
 
   /**
    * Gets list by it's owner, but only the list values
-   * @param owner 
+   * @param owner
    * @returns message with list
    */
   async getList(owner: ObjectId) {
     const list = await this.lists.readOne({ owner });
-    return { msg: `List`, list: list?.list}
+    return { msg: `List`, list: list?.list };
   }
 
   /**
@@ -69,14 +69,14 @@ export default class ListingConcept {
    * @returns message confirming success
    */
   async add(_id: ObjectId, entry: string) {
-    const list = await this.lists.readOne({_id});
-    if (!list){
+    const list = await this.lists.readOne({ _id });
+    if (!list) {
       throw new NotFoundError(`List ${_id} does not exist!`);
     }
     const newList = list.list;
-    newList.push(entry)
-    await this.lists.partialUpdateOne({ _id }, { list:newList });
-    return { msg: `Added ${entry} to List successfully!`, list:newList };
+    newList.push(entry);
+    await this.lists.partialUpdateOne({ _id }, { list: newList });
+    return { msg: `Added ${entry} to List successfully!`, list: newList };
   }
 
   /**
@@ -87,13 +87,13 @@ export default class ListingConcept {
    * @returns message confirming success
    */
   async remove(_id: ObjectId, entry: string) {
-    const list = await this.lists.readOne({_id});
-    if (!list){
+    const list = await this.lists.readOne({ _id });
+    if (!list) {
       throw new NotFoundError(`List ${_id} does not exist!`);
     }
-    const newList = list.list.filter(s=>s!==entry);
-    await this.lists.partialUpdateOne({ _id }, { list:newList });
-    return { msg: `Removed ${entry} from List successfully!`, list:newList };
+    const newList = list.list.filter((s) => s !== entry);
+    await this.lists.partialUpdateOne({ _id }, { list: newList });
+    return { msg: `Removed ${entry} from List successfully!`, list: newList };
   }
 
   async assertOwnerIsUser(_id: ObjectId, user: ObjectId) {

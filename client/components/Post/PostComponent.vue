@@ -16,11 +16,31 @@ const deletePost = async () => {
   }
   emit("refreshPosts");
 };
+
+const likePost = async () => {
+  try {
+    await fetchy(`/api/posts/like/${props.post._id}`, "PATCH");
+  } catch {
+    return;
+  }
+  emit("refreshPosts");
+};
+
+const dislikePost = async () => {
+  try {
+    await fetchy(`/api/posts/dislike/${props.post._id}`, "PATCH");
+  } catch {
+    return;
+  }
+  emit("refreshPosts");
+};
 </script>
 
 <template>
   <p class="author">{{ props.post.author }}</p>
   <p>{{ props.post.content }}</p>
+  <p>{{ props.post.images }}</p>
+  <!-- <img :src="props.post.images" alt="Image" /> -->
   <div class="base">
     <menu v-if="props.post.author == currentUsername">
       <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
@@ -30,6 +50,12 @@ const deletePost = async () => {
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
       <p v-else>Created on: {{ formatDate(props.post.dateCreated) }}</p>
     </article>
+  </div>
+  <div>
+    <p>likes: {{ props.post.like.length }}</p>
+    <button @click="likePost">Like</button>
+    <p>dislikes: {{ props.post.dislike.length }}</p>
+    <button @click="dislikePost">Dislike</button>
   </div>
 </template>
 
