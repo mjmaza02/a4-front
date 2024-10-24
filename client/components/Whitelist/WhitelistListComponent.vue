@@ -14,7 +14,7 @@ let lists = ref<Array<string>>([]);
 let editing = ref("");
 
 async function getList() {
-  let query: Record<string, string> = { "owner": currentUsername };
+  let query = { "owner": currentUsername };
   let listResults;
   try {
     listResults = await fetchy("/api/whitelist", "GET");
