@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import CreateWhitelistEntry from "@/components/Whitelist/CreateWhitelistEntry.vue";
-import EditPostForm from "@/components/Post/EditPostForm.vue";
 import WhitelistComponent from "@/components/Whitelist/WhitelistComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
-import SearchPostForm from "./SearchPostForm.vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
 const { currentUsername } = storeToRefs(useUserStore());
@@ -44,7 +42,6 @@ onBeforeMount(async () => {
   <section class="lists" v-if="loaded && lists.length !== 0">
     <article v-for="entry in lists">
       <WhitelistComponent v-if="editing !== entry" :entry="entry" @refreshList="getList" />
-      <!-- <EditPostForm v-else :post="entry" @refreshList="getList" @editPost="updateEditing" /> -->
     </article>
   </section>
   <p v-else-if="loaded">No lists found</p>
