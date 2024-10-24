@@ -58,7 +58,7 @@ export default class ListingConcept {
    */
   async getList(owner: ObjectId) {
     const list = await this.lists.readOne({ owner });
-    return { msg: `List`, list: list?.list };
+    return { list: list?.list };
   }
 
   /**

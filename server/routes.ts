@@ -115,6 +115,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.like(oid, user);
+    return {};
   }
 
   @Router.patch("/posts/dislike/:id")
@@ -122,6 +123,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.dislike(oid, user);
+    return {};
   }
 
   @Router.patch("/posts/:id")

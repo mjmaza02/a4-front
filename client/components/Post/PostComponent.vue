@@ -47,15 +47,16 @@ const dislikePost = async () => {
       <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
     </menu>
     <article class="timestamp">
-      <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
+      <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}
+      </p>
       <p v-else>Created on: {{ formatDate(props.post.dateCreated) }}</p>
     </article>
-  </div>
-  <div>
-    <p>likes: {{ props.post.like.length }}</p>
-    <button @click="likePost">Like</button>
-    <p>dislikes: {{ props.post.dislike.length }}</p>
-    <button @click="dislikePost">Dislike</button>
+    <menu>
+      <p>likes: {{ props.post.like.length }}</p>
+      <button @click="likePost">Like</button>
+      <p>dislikes: {{ props.post.dislike.length }}</p>
+      <button @click="dislikePost">Dislike</button>
+    </menu>
   </div>
 </template>
 
