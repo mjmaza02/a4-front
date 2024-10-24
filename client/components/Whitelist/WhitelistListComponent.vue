@@ -10,11 +10,11 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 const { currentUsername } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
-let lists = ref<Array<Record<string, string>>>([]);
+let lists = ref<Array<string>>([]);
 let editing = ref("");
 
-async function getList(author?: string) {
-  let query: Record<string, string> = { owner: currentUsername };
+async function getList() {
+  let query: Record<string, string> = { "owner": currentUsername };
   let listResults;
   try {
     listResults = await fetchy("/api/whitelist", "GET");
