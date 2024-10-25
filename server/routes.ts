@@ -93,16 +93,13 @@ class Routes {
     } else {
       posts = await Posting.getPosts();
     }
-    posts.map((post) => {
-      if (post.images) post.images = Checking.parseUrl(post.images);
-    });
     return Responses.posts(posts);
   }
 
   @Router.post("/posts")
-  async createPost(session: SessionDoc, content: string, options?: PostOptions, images?: string) {
+  async createPost(session: SessionDoc, content: string, images: string, options?: PostOptions) {
     const user = Sessioning.getUser(session);
-    const created = await Posting.create(user, content, options, images);
+    const created = await Posting.create(user, content, images, options);
     if (images) {
       const chk = await Checking.getByOwner(user);
       if (chk) await Checking.update(chk._id, images);
@@ -131,6 +128,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.assertAuthorIsUser(oid, user);
+    console.log(images)
     if (images) {
       const post = await Posting.getOnePost(oid);
       const chk = await Checking.getByOwner(user);
@@ -244,17 +242,14 @@ class Routes {
   async deleteTarget(target: string) {
     return await Tracking.delete(target);
   }
-  // @Router.get("/checkIm/:src")
-  // async checkImg(src: string) {
-  // }
   @Router.get("/checkIm")
   async checkIm(session: SessionDoc) {
     let outlist = [];
     const owner = Sessioning.getUser(session);
     const lists = await Checking.check(owner).then((res) => res.list);
     for (const e of lists) {
-      const username = await Authing.getUserById(e.owner).then((res) => res?.username);
-      outlist.push([username, e.image, e.owner.toString()]);
+      const username = await Authing.getUserById(new ObjectId(e[0])).then((res)=>res?.username);
+      outlist.push([username, e[1]]);
     }
     return { list: outlist };
   }

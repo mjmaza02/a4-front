@@ -29,7 +29,7 @@ export default class PostingConcept {
     this.posts = new DocCollection<PostDoc>(collectionName);
   }
 
-  async create(author: ObjectId, content: string, options?: PostOptions, images?: string) {
+  async create(author: ObjectId, content: string, images: string, options?: PostOptions) {
     const _id = await this.posts.createOne({ author, content, options, images, like: new Array<ObjectId>(), dislike: new Array<ObjectId>() });
     return { msg: "Post successfully created!", post: await this.posts.readOne({ _id }) };
   }
@@ -51,7 +51,8 @@ export default class PostingConcept {
   async update(_id: ObjectId, content?: string, options?: PostOptions, images?: string) {
     // Note that if content or options is undefined, those fields will *not* be updated
     // since undefined values for partialUpdateOne are ignored.
-    await this.posts.partialUpdateOne({ _id }, { content, options, images });
+    if (images) await this.posts.partialUpdateOne({ _id }, { content, options, images });
+    else await this.posts.partialUpdateOne({ _id }, { content, options });
     return { msg: "Post successfully updated!" };
   }
 

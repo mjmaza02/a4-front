@@ -7,6 +7,7 @@ import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
 import WhitelistView from "../views/WhitelistView.vue";
+import CheckView from "../views/CheckView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +21,12 @@ const router = createRouter({
       path: "/list",
       name: "Whitelist",
       component: WhitelistView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/check",
+      name: "Check",
+      component: CheckView,
       meta: { requiresAuth: true },
     },
     {

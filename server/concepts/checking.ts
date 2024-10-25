@@ -43,9 +43,8 @@ export default class CheckingConcept {
     const chk = await this.chks.readOne({ _id });
     if (chk) {
       if (image) {
-        const imData = await this.download(image);
         chk.images.push(image);
-        await this.ims.createOne({ owner: _id, image: imData });
+        await this.ims.createOne({ owner: chk.owner, image });
       }
       await this.chks.partialUpdateOne({ _id }, { images: chk.images });
     }
@@ -60,8 +59,7 @@ export default class CheckingConcept {
     const newChecks = chk.images.filter((s) => s !== image);
     await this.chks.partialUpdateOne({ _id }, { images: newChecks });
     if (image) {
-      const imData = await this.download(image);
-      await this.ims.deleteOne({ image: imData });
+      await this.ims.deleteOne({ image });
     }
     return { msg: `Removed ${image} from List successfully!`, list: newChecks };
   }
@@ -88,11 +86,19 @@ export default class CheckingConcept {
     }
   }
 
-  async check(src: string) {
-    const imData = await this.download(src);
-    const posIm = await this.ims.readMany({ image: imData });
-    if (posIm.length > 0) throw new ImageExistsError();
-    return { msg: "Image is unique" };
+  async check(owner: ObjectId) {
+    const ims = await this.getByOwner(owner);
+    if (ims) {
+      // let allMatch: string[] = [];
+      let allMatch: Array<Array<string>> = [];
+      for (const src of ims.images) {
+        const posIm = await this.ims.readMany({ image: src });
+        // allMatch = allMatch.concat(posIm.filter((e) => e.owner.toString() !== owner.toString()).map((e) => e.owner + " " + e.image));
+        posIm.filter((e) => e.owner.toString() !== owner.toString()).forEach((e)=>allMatch.push([e.owner.toString(), e.image]));
+      }
+      return { list: allMatch };
+    }
+    return { list: [] };
   }
 
   private async download(src: string) {
