@@ -203,10 +203,11 @@ class Routes {
   // New
   @Router.patch("/whitelist/add")
   async addToWhitelist(session: SessionDoc, entry: string) {
-    const user = Sessioning.getUser(session);
+    const user = await Sessioning.getUser(session);
+    const eid = await Authing.getUserByUsername(entry);
     const oldList = await Whitelisting.getByOwner(user);
     if (oldList) {
-      return await Whitelisting.add(oldList._id, entry);
+      return await Whitelisting.add(oldList._id, eid._id.toString());
     }
   }
   @Router.patch("/whitelist/remove")
@@ -220,7 +221,16 @@ class Routes {
   @Router.get("/whitelist")
   async getWhitelist(session: SessionDoc) {
     const user = Sessioning.getUser(session);
-    return await Whitelisting.getList(user);
+    const list = await Whitelisting.getList(user);
+    const arr: string[] = [];
+    if (list.list) {
+      for (const e of list.list) {
+        await Authing.getUserById(new ObjectId(e)).then((res) => {
+          if (res.username) arr.push(res.username);
+        });
+      }
+    }
+    return { list: arr };
   }
   @Router.get("/track/:target")
   async getTarget(target: string) {
@@ -238,8 +248,15 @@ class Routes {
   // async checkImg(src: string) {
   // }
   @Router.get("/checkIm")
-  async tempCheck(src: string) {
-    return await Checking.check(src);
+  async checkIm(session: SessionDoc) {
+    let outlist = [];
+    const owner = Sessioning.getUser(session);
+    const lists = await Checking.check(owner).then((res) => res.list);
+    for (const e of lists) {
+      const username = await Authing.getUserById(e.owner).then((res) => res?.username);
+      outlist.push([username, e.image, e.owner.toString()]);
+    }
+    return { list: outlist };
   }
 }
 
