@@ -128,7 +128,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Posting.assertAuthorIsUser(oid, user);
-    console.log(images)
+    console.log(images);
     if (images) {
       const post = await Posting.getOnePost(oid);
       const chk = await Checking.getByOwner(user);
@@ -211,9 +211,10 @@ class Routes {
   @Router.patch("/whitelist/remove")
   async removeFromWhitelist(session: SessionDoc, entry: string) {
     const user = Sessioning.getUser(session);
+    const eid = await Authing.getUserByUsername(entry);
     const oldList = await Whitelisting.getByOwner(user);
-    if (oldList) {
-      return await Whitelisting.remove(oldList._id, entry);
+    if (oldList && eid) {
+      return await Whitelisting.remove(oldList._id, eid._id.toString());
     }
   }
   @Router.get("/whitelist")
@@ -248,8 +249,8 @@ class Routes {
     const owner = Sessioning.getUser(session);
     const lists = await Checking.check(owner).then((res) => res.list);
     for (const e of lists) {
-      const username = await Authing.getUserById(new ObjectId(e[0])).then((res)=>res?.username);
-      outlist.push([username, e[1]]);
+      const username = await Authing.getUserById(e.owner).then((res) => res?.username);
+      outlist.push([username, e.image, e.owner]);
     }
     return { list: outlist };
   }

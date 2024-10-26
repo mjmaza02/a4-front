@@ -90,11 +90,10 @@ export default class CheckingConcept {
     const ims = await this.getByOwner(owner);
     if (ims) {
       // let allMatch: string[] = [];
-      let allMatch: Array<Array<string>> = [];
+      let allMatch: SingleImDoc[] = [];
       for (const src of ims.images) {
         const posIm = await this.ims.readMany({ image: src });
-        // allMatch = allMatch.concat(posIm.filter((e) => e.owner.toString() !== owner.toString()).map((e) => e.owner + " " + e.image));
-        posIm.filter((e) => e.owner.toString() !== owner.toString()).forEach((e)=>allMatch.push([e.owner.toString(), e.image]));
+        allMatch = allMatch.concat(posIm.filter((e) => e.owner.toString() !== owner.toString()));
       }
       return { list: allMatch };
     }

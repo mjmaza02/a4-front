@@ -35,11 +35,16 @@ export default class TrackingConcept {
   async update(target: string) {
     // Note that if counter or options is undefined, those fields will *not* be updated
     // since undefined values for partialUpdateOne are ignored.
-    const tracker = await this.track.readOne({ target });
+    let tracker = await this.track.readOne({ target });
     if (!tracker) {
-      throw new NotFoundError(`Tracker ${target} not found`);
+      tracker = await this.create(target);
     }
-    return await this.track.partialUpdateOne({ target }, { counter: tracker.counter + 1 });
+    if (tracker) {
+      const currentDate = new Date();
+      if (Math.floor((currentDate.getTime() - tracker.dateUpdated.getTime()) / (1000 * 3600 * 24)) > 3) tracker.counter = 0;
+      await this.track.partialUpdateOne({ target }, { counter: tracker.counter + 1 });
+      return { counter: tracker.counter + 1 };
+    }
   }
 
   async reduce(target: string) {
