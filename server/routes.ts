@@ -99,11 +99,10 @@ class Routes {
   @Router.post("/posts")
   async createPost(session: SessionDoc, content: string, images: string, options?: PostOptions) {
     const user = Sessioning.getUser(session);
+    images = Checking.parseUrl(images);
     const created = await Posting.create(user, content, images, options);
-    if (images) {
-      const chk = await Checking.getByOwner(user);
-      if (chk) await Checking.update(chk._id, images);
-    }
+    const chk = await Checking.getByOwner(user);
+    if (chk) await Checking.update(chk._id, images);
     return { msg: created.msg, post: await Responses.post(created.post) };
   }
 
@@ -236,8 +235,24 @@ class Routes {
     return await Tracking.getByTarget(target);
   }
   @Router.patch("/track/:target")
-  async changeTarget(target: string) {
-    return await Tracking.update(target);
+  async changeTarget(session: SessionDoc, target: string) {
+    const user = await Sessioning.getUser(session);
+    const deleteTarget = await Tracking.update(user, target).then((res) => res?.delete);
+    if (deleteTarget) {
+      console.log("HERE");
+      // Delete user subroutine
+      const user = new ObjectId(target);
+      const list = await Whitelisting.getByOwner(user);
+      if (list) {
+        await Whitelisting.delete(list._id, user);
+      }
+      const chk = await Checking.getByOwner(user);
+      if (chk) {
+        await Checking.delete(chk._id, user);
+      }
+      return await Authing.delete(user);
+    }
+    return { msg: target + " reported" };
   }
   @Router.delete("/track/:target")
   async deleteTarget(target: string) {
@@ -245,7 +260,7 @@ class Routes {
   }
   @Router.get("/checkIm")
   async checkIm(session: SessionDoc) {
-    let outlist = [];
+    const outlist = [];
     const owner = Sessioning.getUser(session);
     const lists = await Checking.check(owner).then((res) => res.list);
     for (const e of lists) {

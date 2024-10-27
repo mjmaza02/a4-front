@@ -100,38 +100,11 @@ export default class CheckingConcept {
     return { list: [] };
   }
 
-  private async download(src: string) {
-    const finalUrl = this.parseUrl(src);
-    return await this.readUrlData(finalUrl);
-  }
-
-  private async readUrlData(url: string) {
-    const response = await fetch(url);
-    if (!response.body) throw new NotFoundError("URL INVALID");
-
-    const reader = response.body.getReader();
-    let data = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        // Do something with last chunk of data then exit reader
-        return data;
-      }
-      // Otherwise do something here to process current chunk
-      value.forEach((e) => {
-        data += e.toString(16);
-      });
-    }
-  }
-
   parseUrl(src: string) {
-    const re = /\/([^\/]+.)\//gm;
+    const re = /(.+\/)/gm;
     const parsed_src = src.match(re);
-    let fileId = "";
-    if (parsed_src && parsed_src.length == 2) {
-      fileId = parsed_src[1].slice(1, -1);
-    }
-    return "https://drive.usercontent.google.com/download?id=" + fileId;
+    if (parsed_src) return parsed_src[0] + "preview";
+    else throw new NotAllowedError("Invalid Image URL");
   }
 }
 

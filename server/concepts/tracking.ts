@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotFoundError } from "./errors";
 
@@ -5,6 +6,8 @@ export interface TrackingDoc extends BaseDoc {
   target: string;
   counter: number;
 }
+
+const maxReports = 5;
 
 /**
  * concept: Posting [Author]
@@ -32,9 +35,7 @@ export default class TrackingConcept {
     return tracker;
   }
 
-  async update(target: string) {
-    // Note that if counter or options is undefined, those fields will *not* be updated
-    // since undefined values for partialUpdateOne are ignored.
+  async update(user: ObjectId, target: string) {
     let tracker = await this.track.readOne({ target });
     if (!tracker) {
       tracker = await this.create(target);
@@ -42,8 +43,11 @@ export default class TrackingConcept {
     if (tracker) {
       const currentDate = new Date();
       if (Math.floor((currentDate.getTime() - tracker.dateUpdated.getTime()) / (1000 * 3600 * 24)) > 3) tracker.counter = 0;
-      await this.track.partialUpdateOne({ target }, { counter: tracker.counter + 1 });
-      return { counter: tracker.counter + 1 };
+      else if (tracker.counter >= maxReports) return { delete: true };
+      else {
+        await this.track.partialUpdateOne({ target }, { counter: tracker.counter + 1 });
+        return { delete: false };
+      }
     }
   }
 

@@ -1,31 +1,17 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { storeToRefs } from "pinia";
-import { fetchy } from "../../utils/fetchy";
+// import { useUserStore } from "@/stores/user";
+// import { storeToRefs } from "pinia";
+// import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["user", "src"]);
-const emit = defineEmits(["refreshList"]);
-const { currentUsername } = storeToRefs(useUserStore());
-
-const deleteEntry = async () => {
-  try {
-    await fetchy(`/api/whitelist/remove`, "PATCH", {
-      body: { entry: props.user }
-    });
-  } catch {
-    return;
-  }
-  emit("refreshList");
-};
 </script>
 
 <template>
-  <p><b>{{ props.user }}</b></p>
-  <p>{{ props.src }}</p>
-  <div class="base">
-    <menu>
-      <!-- <li><button class="button-error btn-small pure-button" @click="deleteEntry">Delete</button></li> -->
-    </menu>
+  <div class="entry">
+    <p>
+      <b>{{ props.user }}</b>
+    </p>
+    <iframe :src="props.src" width="400" height="300"></iframe>
   </div>
 </template>
 
@@ -63,5 +49,11 @@ menu {
 
 .base article:only-child {
   margin-left: auto;
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 </style>

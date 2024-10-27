@@ -39,7 +39,7 @@ const dislikePost = async () => {
 <template>
   <p class="author">{{ props.post.author }}</p>
   <p>{{ props.post.content }}</p>
-  <p>{{ props.post.images }}</p>
+  <iframe :src=props.post.images width="640" height="480"></iframe>
   <!-- <img :src="props.post.images" alt="Image" /> -->
   <div class="base">
     <menu v-if="props.post.author == currentUsername">
@@ -47,8 +47,7 @@ const dislikePost = async () => {
       <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
     </menu>
     <article class="timestamp">
-      <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}
-      </p>
+      <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
       <p v-else>Created on: {{ formatDate(props.post.dateCreated) }}</p>
     </article>
     <menu>

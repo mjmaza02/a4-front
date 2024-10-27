@@ -6,7 +6,6 @@ import { onBeforeMount, ref } from "vue";
 import CheckComponent from "./CheckComponent.vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
-const { currentUsername } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 let checks = ref<Array<string>>([]);
@@ -20,17 +19,19 @@ async function getChecks() {
   } catch {
     return;
   }
-  checks.value = listResults.list.filter((e:string[])=>!lists.value.includes(e[0]));
+  checks.value = listResults.list.filter((e: string[]) => !lists.value.includes(e[0]));
 }
 
 async function updateTrackers(vals: string[]) {
   for (const target of vals) {
     try {
-      const res = await fetchy(`/api/track/${target}`, "PATCH");
+      await fetchy(`/api/track/${target}`, "PATCH");
+      await getChecks();
     } catch {
       return;
     }
   }
+  checked.value = [];
 }
 
 async function getList() {
@@ -58,10 +59,10 @@ onBeforeMount(async () => {
     <form @submit.prevent="updateTrackers(checked)">
       <article v-for="(entry, index) in checks">
         <CheckComponent :user="entry[0]" :src="entry[1]" @refreshList="getChecks" />
-        <input type="checkbox" :id="index.toString()" :value="entry[2]" v-model="checked"/>
+        <input type="checkbox" :id="index.toString()" :value="entry[2]" v-model="checked" />
       </article>
       <section class="button-menu">
-        <button class="pure-button-primary pure-button button-error" @click="()=>checked=[]">Cancel</button>
+        <button class="pure-button-primary pure-button button-error" @click="() => (checked = [])">Cancel</button>
         <button type="submit" class="pure-button-primary pure-button">Report</button>
       </section>
     </form>
@@ -89,6 +90,7 @@ article {
   border-radius: 1em;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   gap: 0.5em;
   padding: 1em;
   margin: 0 0 1em 0;
