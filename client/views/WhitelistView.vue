@@ -3,7 +3,7 @@ import WhitelistListComponent from "@/components/Whitelist/WhitelistListComponen
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { isLoggedIn } = storeToRefs(useUserStore());
 </script>
 
 <template>

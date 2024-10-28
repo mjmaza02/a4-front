@@ -62,8 +62,8 @@ onBeforeMount(async () => {
         <input type="checkbox" :id="index.toString()" :value="entry[2]" v-model="checked" />
       </article>
       <section class="button-menu">
-        <button class="pure-button-primary pure-button button-error" @click="() => (checked = [])">Cancel</button>
-        <button type="submit" class="pure-button-primary pure-button">Report</button>
+        <button class="pure-button button-error" @click="() => (checked = [])">Cancel</button>
+        <button type="submit" class="button-main pure-button">Report</button>
       </section>
     </form>
   </section>

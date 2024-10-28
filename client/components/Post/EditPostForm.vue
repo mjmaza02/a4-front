@@ -27,7 +27,7 @@ const editPost = async (content: string, images: string) => {
     <textarea id="images" v-model="images" placeholder="add images to a post!"> </textarea>
     <div class="base">
       <menu>
-        <li><button class="btn-small pure-button-primary pure-button" type="submit">Save</button></li>
+        <li><button class="btn-small button-main pure-button" type="submit">Save</button></li>
         <li><button class="btn-small pure-button" @click="emit('editPost')">Cancel</button></li>
       </menu>
       <p v-if="props.post.dateCreated !== props.post.dateUpdated" class="timestamp">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>

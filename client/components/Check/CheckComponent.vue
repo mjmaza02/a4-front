@@ -8,9 +8,7 @@ const props = defineProps(["user", "src"]);
 
 <template>
   <div class="entry">
-    <p>
-      <b>{{ props.user }}</b>
-    </p>
+    <p class="author">{{ props.user }}</p>
     <iframe :src="props.src" width="400" height="300"></iframe>
   </div>
 </template>
@@ -18,11 +16,6 @@ const props = defineProps(["user", "src"]);
 <style scoped>
 p {
   margin: 0em;
-}
-
-.author {
-  font-weight: bold;
-  font-size: 1.2em;
 }
 
 menu {
@@ -43,17 +36,11 @@ menu {
 
 .base {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
 }
 
 .base article:only-child {
   margin-left: auto;
-}
-
-.entry {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
 </style>

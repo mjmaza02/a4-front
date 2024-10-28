@@ -10,7 +10,7 @@ const emit = defineEmits(["getPostsByAuthor"]);
     <fieldset>
       <legend>Search by Author</legend>
       <input id="author" type="text" v-model="author" placeholder="Username" />
-      <button type="submit" class="pure-button pure-button-primary">Search</button>
+      <button type="submit" class="pure-button button-main">Search</button>
     </fieldset>
   </form>
 </template>

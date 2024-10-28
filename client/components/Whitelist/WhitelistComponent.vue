@@ -24,8 +24,7 @@ const deleteEntry = async () => {
   <p>{{ props.entry }}</p>
   <div class="base">
     <menu>
-      <!-- <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li> -->
-      <li><button class="button-error btn-small pure-button" @click="deleteEntry">Delete</button></li>
+      <li><button class="button-error pure-button" @click="deleteEntry">Delete</button></li>
     </menu>
   </div>
 </template>

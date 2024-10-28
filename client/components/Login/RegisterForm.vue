@@ -28,7 +28,7 @@ async function register() {
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
       <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Register</button>
+        <button type="submit" class="pure-button button-main">Register</button>
       </div>
     </fieldset>
   </form>

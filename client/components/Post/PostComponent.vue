@@ -38,9 +38,8 @@ const dislikePost = async () => {
 
 <template>
   <p class="author">{{ props.post.author }}</p>
+  <iframe :src="props.post.images" width="640" height="480"></iframe>
   <p>{{ props.post.content }}</p>
-  <iframe :src=props.post.images width="640" height="480"></iframe>
-  <!-- <img :src="props.post.images" alt="Image" /> -->
   <div class="base">
     <menu v-if="props.post.author == currentUsername">
       <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
@@ -51,10 +50,10 @@ const dislikePost = async () => {
       <p v-else>Created on: {{ formatDate(props.post.dateCreated) }}</p>
     </article>
     <menu>
-      <p>likes: {{ props.post.like.length }}</p>
-      <button @click="likePost">Like</button>
-      <p>dislikes: {{ props.post.dislike.length }}</p>
-      <button @click="dislikePost">Dislike</button>
+      <button class="pure-button button-main btn-small" @click="likePost">Like</button>
+      <p>{{ props.post.like.length }}</p>
+      <button class="pure-button button-main btn-small" @click="dislikePost">Dislike</button>
+      <p>{{ props.post.dislike.length }}</p>
     </menu>
   </div>
 </template>
@@ -64,11 +63,6 @@ p {
   margin: 0em;
 }
 
-.author {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
 menu {
   list-style-type: none;
   display: flex;
@@ -76,6 +70,7 @@ menu {
   gap: 1em;
   padding: 0;
   margin: 0;
+  align-items: center;
 }
 
 .timestamp {

@@ -1,8 +1,13 @@
 /* Add some global styles here! */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
 
 :root {
   --red: rgb(208, 67, 12);
+  --lblue: #4a8fe7;
+  --yellow: #ffd046;
   --base-bg: #f1f3f5;
+  font-family: "Poppins", sans-serif;
+
 }
 
 button.btn-small {
@@ -12,6 +17,16 @@ button.btn-small {
 button.button-error {
   color: white;
   background: var(--red);
+}
+
+button.button-main {
+  color: white;
+  background: var(--lblue);
+}
+
+button.button-main {
+  color: white;
+  background: var(--lblue);
 }
 
 a.button {
@@ -29,4 +44,9 @@ a.button {
   justify-content: center;
   align-items: center;
   gap: 1em;
+}
+
+.author {
+  font-weight: bold;
+  font-size: 1.2em;
 }

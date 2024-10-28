@@ -26,7 +26,7 @@ const emptyForm = () => {
   <form @submit.prevent="createEntry(entry)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="entry" placeholder="Add a Whitelist Entry!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button">Add</button>
+    <button type="submit" class="button-main pure-button">Add</button>
   </form>
 </template>
 
