@@ -7,7 +7,6 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
-const { currentUsername } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 let lists = ref<Array<string>>([]);
@@ -23,10 +22,6 @@ async function getList() {
   lists.value = listResults.list;
 }
 
-function updateEditing(id: string) {
-  editing.value = id;
-}
-
 onBeforeMount(async () => {
   await getList();
   loaded.value = true;
@@ -35,10 +30,11 @@ onBeforeMount(async () => {
 
 <template>
   <section v-if="isLoggedIn">
-    <h2>Add to Whitelist</h2>
+    <h2>Add to whitelist</h2>
     <CreateWhitelistEntry @refreshList="getList" />
   </section>
   <section class="lists" v-if="loaded && lists.length !== 0">
+    <h2>Currently whitelisted accounts:</h2>
     <article v-for="entry in lists">
       <WhitelistComponent v-if="editing !== entry" :entry="entry" @refreshList="getList" />
     </article>

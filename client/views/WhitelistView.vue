@@ -9,6 +9,7 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <h1>Whitelist</h1>
+    <p>Account allowed to repost your content</p>
     <section>
       <section v-if="isLoggedIn">
         <WhitelistListComponent />
@@ -19,7 +20,8 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 </template>
 
 <style scoped>
-h1 {
+h1,
+p {
   text-align: center;
 }
 </style>

@@ -21,7 +21,7 @@ const editPost = async (content: string, images: string) => {
 </script>
 
 <template>
-  <form @submit.prevent="editPost(content, images)">
+  <form @submit.prevent="editPost(content, images)" class="pure-form">
     <p class="author">{{ props.post.author }}</p>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
     <textarea id="images" v-model="images" placeholder="add images to a post!"> </textarea>

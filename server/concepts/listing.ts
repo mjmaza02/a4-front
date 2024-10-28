@@ -76,7 +76,7 @@ export default class ListingConcept {
     const newList = list.list;
     newList.push(entry);
     await this.lists.partialUpdateOne({ _id }, { list: newList });
-    return { msg: `Added ${entry} to List successfully!`, list: newList };
+    return { msg: `Added to list successfully!`, list: newList };
   }
 
   /**
@@ -93,7 +93,7 @@ export default class ListingConcept {
     }
     const newList = list.list.filter((s) => s !== entry);
     await this.lists.partialUpdateOne({ _id }, { list: newList });
-    return { msg: `Removed ${entry} from List successfully!`, list: newList };
+    return { msg: `Removed from list successfully!`, list: newList };
   }
 
   async assertOwnerIsUser(_id: ObjectId, user: ObjectId) {

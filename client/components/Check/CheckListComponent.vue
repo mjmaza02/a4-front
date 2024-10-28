@@ -52,14 +52,13 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <section v-if="isLoggedIn">
-    <h2>Checklist</h2>
-  </section>
   <section class="lists" v-if="loaded && checks.length !== 0">
     <form @submit.prevent="updateTrackers(checked)">
       <article v-for="(entry, index) in checks">
         <CheckComponent :user="entry[0]" :src="entry[1]" @refreshList="getChecks" />
-        <input type="checkbox" :id="index.toString()" :value="entry[2]" v-model="checked" />
+        <label :for="index.toString()" class="pure-checkbox">
+          <input type="checkbox" :id="index.toString()" :value="entry[2]" v-model="checked" />
+        </label>
       </article>
       <section class="button-menu">
         <button class="pure-button button-error" @click="() => (checked = [])">Cancel</button>

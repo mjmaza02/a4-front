@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { formatDate } from "@/utils/formatDate";
-import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["entry"]);
 const emit = defineEmits(["refreshList"]);
-const { currentUsername } = storeToRefs(useUserStore());
 
 const deleteEntry = async () => {
   try {
     await fetchy(`/api/whitelist/remove`, "PATCH", {
-      body: { entry: props.entry }
+      body: { entry: props.entry },
     });
   } catch {
     return;

@@ -38,7 +38,7 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Whitelist' }" :class="{ underline: currentRouteName == 'Whitelist' }"> Whitelist </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Check' }" :class="{ underline: currentRouteName == 'Check' }"> Checklist </RouterLink>
+          <RouterLink :to="{ name: 'Check' }" :class="{ underline: currentRouteName == 'Check' }"> Repeated Images </RouterLink>
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>

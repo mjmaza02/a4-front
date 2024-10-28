@@ -3,12 +3,13 @@ import CheckListComponent from "@/components/Check/CheckListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { isLoggedIn } = storeToRefs(useUserStore());
 </script>
 
 <template>
   <main>
     <h1>Repeated Images</h1>
+    <p>Duplicate images found across the site</p>
     <section>
       <section v-if="isLoggedIn">
         <CheckListComponent />
@@ -19,7 +20,8 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </template>
 
 <style scoped>
-h1 {
+h1,
+p {
   text-align: center;
 }
 </style>
