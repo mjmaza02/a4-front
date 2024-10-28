@@ -252,7 +252,7 @@ class Routes {
       }
       return await Authing.delete(user);
     }
-    return { msg: target + " reported" };
+    return {};
   }
   @Router.delete("/track/:target")
   async deleteTarget(target: string) {

@@ -91,6 +91,7 @@ article {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: start;
   gap: 0.5em;
   padding: 1em;
   margin: 0 0 1em 0;
